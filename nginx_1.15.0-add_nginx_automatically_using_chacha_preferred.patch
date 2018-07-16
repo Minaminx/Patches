@@ -1,0 +1,25 @@
+From d4fcdcd233c4fc739b696904600de08a430e1c76 Mon Sep 17 00:00:00 2001
+From: nanqinlang <github@sometimesnaive.org>
+Date: Mon, 16 Jul 2018 12:11:47 +0800
+Subject: [PATCH] add nginx_automatically_using_CHACHA_preferred.
+
+via: kn007@c59592b
+---
+ src/event/ngx_event_openssl.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/event/ngx_event_openssl.c b/src/event/ngx_event_openssl.c
+index b2b7a5f..c4454fc 100644
+--- a/src/event/ngx_event_openssl.c
++++ b/src/event/ngx_event_openssl.c
+@@ -330,6 +330,10 @@ ngx_ssl_create(ngx_ssl_t *ssl, ngx_uint_t protocols, void *data)
+     }
+ #endif
+ 
++#ifdef SSL_OP_PRIORITIZE_CHACHA
++    SSL_CTX_set_options(ssl->ctx, SSL_OP_PRIORITIZE_CHACHA);
++#endif
++
+ #ifdef SSL_OP_NO_COMPRESSION
+     SSL_CTX_set_options(ssl->ctx, SSL_OP_NO_COMPRESSION);
+ #endif
