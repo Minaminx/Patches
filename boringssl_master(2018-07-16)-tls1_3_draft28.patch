@@ -1,0 +1,64 @@
+From 92b2e8053c741fe3b87af0b42cf2cc150ee11e82 Mon Sep 17 00:00:00 2001
+From: nanqinlang <github@sometimesnaive.org>
+Date: Mon, 16 Jul 2018 15:06:58 +0800
+Subject: [PATCH] support for TLS1.3 Draft28/23.
+
+this will do the following changes:
+  - conf_max_version = TLS1_3_VERSION;
+  - *out = TLS1_3_VERSION;
+
+via: dcc
+---
+ ssl/s3_lib.cc       | 2 +-
+ ssl/ssl_test.cc     | 4 ++--
+ ssl/ssl_versions.cc | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/ssl/s3_lib.cc b/ssl/s3_lib.cc
+index 9e4d7d8a5..5388a29d9 100644
+--- a/ssl/s3_lib.cc
++++ b/ssl/s3_lib.cc
+@@ -202,7 +202,7 @@ bool ssl3_new(SSL *ssl) {
+   // TODO(davidben): Move this field into |s3|, have it store the normalized
+   // protocol version, and implement this pre-negotiation quirk in |SSL_version|
+   // at the API boundary rather than in internal state.
+-  ssl->version = TLS1_2_VERSION;
++  ssl->version = TLS1_3_VERSION;  /// ssl->version = TLS1_2_VERSION;
+   return true;
+ }
+ 
+diff --git a/ssl/ssl_test.cc b/ssl/ssl_test.cc
+index 851516f6f..86ad13440 100644
+--- a/ssl/ssl_test.cc
++++ b/ssl/ssl_test.cc
+@@ -2589,7 +2589,7 @@ TEST(SSLTest, SetVersion) {
+ 
+   // Zero is the default version.
+   EXPECT_TRUE(SSL_CTX_set_max_proto_version(ctx.get(), 0));
+-  EXPECT_EQ(TLS1_2_VERSION, ctx->conf_max_version);
++  EXPECT_EQ(TLS1_3_VERSION, ctx->conf_max_version);  /// EXPECT_EQ(TLS1_2_VERSION, ctx->conf_max_version);
+   EXPECT_TRUE(SSL_CTX_set_min_proto_version(ctx.get(), 0));
+   EXPECT_EQ(TLS1_VERSION, ctx->conf_min_version);
+ 
+@@ -2623,7 +2623,7 @@ TEST(SSLTest, SetVersion) {
+   EXPECT_FALSE(SSL_CTX_set_min_proto_version(ctx.get(), 0x1234));
+ 
+   EXPECT_TRUE(SSL_CTX_set_max_proto_version(ctx.get(), 0));
+-  EXPECT_EQ(TLS1_2_VERSION, ctx->conf_max_version);
++  EXPECT_EQ(TLS1_3_VERSION, ctx->conf_max_version);  /// EXPECT_EQ(TLS1_2_VERSION, ctx->conf_max_version);
+   EXPECT_TRUE(SSL_CTX_set_min_proto_version(ctx.get(), 0));
+   EXPECT_EQ(TLS1_1_VERSION, ctx->conf_min_version);
+ }
+diff --git a/ssl/ssl_versions.cc b/ssl/ssl_versions.cc
+index a5a7cd970..24c45165a 100644
+--- a/ssl/ssl_versions.cc
++++ b/ssl/ssl_versions.cc
+@@ -184,7 +184,7 @@ static bool set_max_version(const SSL_PROTOCOL_METHOD *method, uint16_t *out,
+                             uint16_t version) {
+   // Zero is interpreted as the default maximum version.
+   if (version == 0) {
+-    *out = TLS1_2_VERSION;
++    *out = TLS1_3_VERSION;  /// *out = TLS1_2_VERSION;
+     return true;
+   }
+ 
